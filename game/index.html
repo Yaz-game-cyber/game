@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<!-- 響應式設定 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>垃圾分類挑戰</title>
+
+<style>
+/* ================= 全局樣式 ================= */
+body {
+  font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+
+  /* 背景深墨綠 + 環保漸層 */
+  background: linear-gradient(135deg, #0d2e1f, #134d36, #1a6b48);
+
+  margin: 0;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column; /* 讓按鈕能在頁面最下方 */
+  align-items: center;
+  min-height: 100vh;
+
+  color: #e6f5ef;
+}
+
+/* ================= 主遊戲框 ================= */
+#game {
+  width: 100%; /* 滿版 */
+  max-width: 900px; /* 最大限制 */
+  
+  background: rgba(20, 40, 35, 0.6);
+  backdrop-filter: blur(18px);
+
+  border-radius: 28px;
+  padding: 40px; /* 稍微加大內距 */
+  margin-bottom: 100px; /* 與回首頁按鈕分開更多距離 */
+
+  box-shadow: 
+    0 20px 50px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(255,255,255,0.05);
+  z-index: 1;
+}
+
+/* ================= 標題 ================= */
+h1 {
+  text-align: center;
+  font-size: 32px; /* 放大字體 */
+  margin-bottom: 25px;
+  color: #dffaf0;
+  text-shadow: 0 0 10px rgba(110, 255, 160, 0.3);
+  letter-spacing: 1px;
+}
+
+/* ================= 題目區 ================= */
+#question {
+  background: linear-gradient(135deg, #a0c9a2, #7aa881); /* 淡墨綠漸層 */
+  padding: 24px;
+  border-radius: 18px;
+  font-size: 26px; /* 放大字體 */
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25); /* 陰影稍微加深，更穩重 */
+  color: #133822; /* 深墨綠文字，對比清楚 */
+}
+
+/* ================= 垃圾區 ================= */
+#trash-bin {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: 18px;
+  background: rgba(20, 40, 35, 0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ================= 垃圾物件 ================= */
+.trash-item {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.trash-item img {
+  width: 80px; /* 放大圖片 */
+  height: 80px;
+  object-fit: contain;
+  filter: brightness(0.95) contrast(1.05);
+}
+
+.trash-item:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* ================= 結果提示 ================= */
+#result {
+  margin-top: 25px;
+  font-size: 22px; /* 放大字體 */
+  text-align: center;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.correct {
+  color: #6fffc2;
+}
+
+.error {
+  color: #ff7a7a;
+}
+
+/* ================= 回首頁按鈕 ================= */
+#home-btn {
+  position: fixed; /* 固定在頁面底部 */
+  bottom: 30px; /* 與主遊戲框分開更遠 */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  padding: 16px 32px;
+  border-radius: 20px;
+
+  background: linear-gradient(135deg, #2a7b52, #5ac187);
+  color: #eafff6;
+  font-size: 18px; /* 放大字體 */
+  font-weight: bold;
+
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.5);
+  transition: all 0.25s;
+}
+
+#home-btn:hover {
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+}
+
+/* ================= 手機優化 ================= */
+@media (max-width: 600px) {
+  #game {
+    padding: 30px;
+    margin-bottom: 120px; /* 多給按鈕空間 */
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  #question {
+    font-size: 22px;
+    padding: 20px;
+  }
+
+  .trash-item img {
+    width: 70px;
+    height: 70px;
+  }
+
+  #result {
+    font-size: 20px;
+  }
+
+  #home-btn {
+    font-size: 16px;
+    padding: 14px 28px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= 遊戲畫面 ================= -->
+<div id="game">
+  <h1>♻️ 垃圾分類挑戰</h1>
+
+  <div id="question">載入中...</div>
+  <div id="trash-bin"></div>
+  <div id="result"></div>
+</div>
+
+<!-- ================= 回首頁按鈕 ================= -->
+<a href="https://yicn-stack.github.io/smart-trash-ai/" id="home-btn"> 回首頁</a>
+
+<style>
+/* ================= 全局 ================= */
+body {
+  font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  margin: 0;
+  padding: 10px;
+}
+
+/* ================= 題目 ================= */
+#question {
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  color: white;
+  padding: 15px;
+  border-radius: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ================= 垃圾區 ================= */
+#trash-bin {
+  width: 100%;
+  margin-top: 15px;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  gap: 6px; /*  間距縮小  */
+}
+
+/* ================= 圖片================= */
+.trash-item {
+  width: 100px;      /*  固定寬 */
+  height: 100px;     /*  固定高 → 完全一致 */
+
+  object-fit: cover; /*  保持比例 + 填滿 */
+
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+/* hover 動畫 */
+.trash-item:hover {
+  transform: scale(1.1);
+}
+
+/* 點擊效果 */
+.correct {
+  opacity: 0.4;
+}
+
+/* 結果 */
+.success { color: green; }
+.error { color: red; }
+
+/* ================= 手機優化 ================= */
+@media (max-width: 600px) {
+  .trash-item {
+    width: 80px;
+    height: 80px;
+  }
+
+  #trash-bin {
+    gap: 5px; /* 手機再更緊一點 */
+  }
+}
+</style>
+
+<script>
+/* ================= 分類 ================= */
+const categories = [
+  { key: "塑膠", name: "塑膠" },
+  { key: "紙", name: "紙" },
+  { key: "電池", name: "電池" },
+  { key: "玻璃", name: "玻璃" }
+];
+
+/* ================= 大量圖片庫（可自行增加） ================= */
+const trashListMaster = [
+  // 塑膠
+  { img: "images/plastic1.jpg", type: "塑膠" },
+  { img: "images/plastic2.jpg", type: "塑膠" },
+  { img: "images/plastic3.jpg", type: "塑膠" },
+  { img: "images/plastic4.jpg", type: "塑膠" },
+  { img: "images/plastic5.jpg", type: "塑膠" },
+  { img: "images/plastic6.jpg", type: "塑膠" },
+  { img: "images/plastic7.jpg", type: "塑膠" },
+  { img: "images/plastic8.jpg", type: "塑膠" },
+  { img: "images/plastic9.jpg", type: "塑膠" },
+  { img: "images/plastic10.jpg", type: "塑膠" },
+
+
+  // 紙
+  { img: "images/paper1.jpg", type: "紙" },
+  { img: "images/paper2.jpg", type: "紙" },
+  { img: "images/paper3.jpg", type: "紙" },
+  { img: "images/paper4.jpg", type: "紙" },
+  { img: "images/paper5.jpg", type: "紙" },
+  { img: "images/paper6.jpg", type: "紙" },
+  { img: "images/paper7.jpg", type: "紙" },
+  { img: "images/paper8.jpg", type: "紙" },
+  { img: "images/paper9.jpg", type: "紙" },
+  { img: "images/paper10.jpg", type: "紙" },
+
+  // 電池
+  { img: "images/battery1.jpg", type: "電池" },
+  { img: "images/battery2.jpg", type: "電池" },
+  { img: "images/battery3.jpg", type: "電池" },
+  { img: "images/battery4.jpg", type: "電池" },
+  { img: "images/battery5.jpg", type: "電池" },
+  { img: "images/battery6.jpg", type: "電池" },
+  { img: "images/battery7.jpg", type: "電池" },
+  { img: "images/battery8.jpg", type: "電池" },
+  { img: "images/battery9.jpg", type: "電池" },
+  { img: "images/battery10.jpg", type: "電池" },
+
+  // 玻璃
+  { img: "images/glass1.jpg", type: "玻璃" },
+  { img: "images/glass2.jpg", type: "玻璃" },
+  { img: "images/glass3.jpg", type: "玻璃" },
+  { img: "images/glass4.jpg", type: "玻璃" },
+  { img: "images/glass5.jpg", type: "玻璃" },
+  { img: "images/glass6.jpg", type: "玻璃" },
+  { img: "images/glass7.jpg", type: "玻璃" },
+  { img: "images/glass8.jpg", type: "玻璃" },
+  { img: "images/glass9.jpg", type: "玻璃" },
+  { img: "images/glass10.jpg", type: "玻璃" }
+];
+
+/* ================= 狀態 ================= */
+let currentCategory;
+let remainingCount;
+let previousCategory = null;
+
+/* ================= 洗牌 ================= */
+function shuffleArray(arr) {
+  for (let i = arr.length -1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+/* ================= 生成關卡 ================= */
+function generateTrash() {
+
+   /* ---------------- 取得畫面元素 ---------------- */
+  const bin = document.getElementById("trash-bin");
+
+  const result = document.getElementById("result");
+  // 清空結果文字（例如上一關的  正確 或  錯誤）
+
+  /* ---------------- 清空畫面 ---------------- */
+  bin.innerHTML = "";
+  result.textContent = "";
+
+  /* 隨機題目 */
+
+  /* 從分類中「過濾掉上一題」 */
+  let newCategories = categories.filter(c => c.key !== previousCategory);
+  /* 從剩下的分類中隨機選一個 */
+  currentCategory = newCategories[Math.floor(Math.random() * newCategories.length)];
+  /* 記錄這一題，給下一題用 避免重複 */
+  previousCategory = currentCategory.key;
+
+  /* 顯示題目文字 */
+  document.getElementById("question").textContent =
+    `請找出「${currentCategory.name}」類垃圾`;
+
+  /* 複製並打亂圖片池 */
+  let pool = [...trashListMaster];
+  shuffleArray(pool);
+
+  /* 正確答案 3~4 */
+  let correctItems = pool
+    .filter(t => t.type === currentCategory.key)
+    .slice(0, Math.floor(Math.random()*2)+3);
+
+  /* 干擾圖片 */
+  let wrongItems = pool
+    .filter(t => t.type !== currentCategory.key)
+    .slice(0, 6 - correctItems.length);
+
+  let items = correctItems.concat(wrongItems);
+  shuffleArray(items);
+
+  remainingCount = correctItems.length;
+
+  /* 排版 */
+  /* 設定畫面要分成幾欄幾列 */
+  const cols = 3;
+  const rows = 2;
+
+  /* 計算每一格的寬度與高度 */
+  const xSpacing = bin.clientWidth / cols;
+  const ySpacing = bin.clientHeight / rows;
+  /* 設定圖片大小 */
+  const imgSize = Math.min(xSpacing, ySpacing) * 0.7;
+
+  /* ================= 建立圖片 ================= */
+  items.forEach((item, index) => {
+    /* 建立 img 元素 */
+    const img = document.createElement("img");
+
+    /* 設定圖片來源 */
+    img.src = item.img;
+      /* 加上 CSS class 控制樣式 */
+    img.classList.add("trash-item");
+     /* 存這張圖片的分類 用來判斷對錯 */
+    img.dataset.type = item.type;
+    /* 點擊事件 點圖片會觸發檢查 */
+    img.onclick = () => checkTrash(img);
+
+     /* ================= 計算位置 ================= */
+
+     /* 計算目前是第幾欄 */
+    const col = index % cols;
+     /* 計算目前是第幾列 */
+    const row = Math.floor(index / cols);
+
+    /* ================= 設定實際位置 ================= */
+    /* 設定圖片 X 座標 */
+    img.style.left = col * xSpacing + (xSpacing - imgSize)/2 + "px";
+     /* 設定圖片 Y 座標 */
+    img.style.top = row * ySpacing + (ySpacing - imgSize)/2 + "px";
+
+     /* 設定圖片大小 */
+    img.style.width = imgSize + "px";
+    img.style.height = imgSize + "px";
+
+    /* 把圖片加進畫面 */
+    bin.appendChild(img);
+  });
+}
+
+/* ================= 點擊判斷 ================= */
+function checkTrash(img) {
+  /* 取得結果顯示區 */
+  const result = document.getElementById("result");
+
+   /* ================= 判斷是否正確 ================= */
+
+  if (img.dataset.type === currentCategory.key) {
+    /* 加上正確樣式 變淡 */
+    img.classList.add("correct");
+    /* 禁止再次點擊 */
+    img.style.pointerEvents = "none";
+
+     /* 剩餘正確數量 -1 */
+    remainingCount--;
+
+    /* 顯示成功訊息 */
+    result.className = "success"; // 套用綠色樣式
+    result.textContent = `✔ 正確！剩 ${remainingCount} 個`;
+
+     /* ================= 點錯 ================= */
+  } else {
+    result.className = "error";
+    result.textContent = "✖ 錯誤，再試一次！";
+  }
+     /* ================= 是否過關 ================= */
+  if (remainingCount === 0) {
+    result.textContent = "🎉 完成！下一關...";
+    setTimeout(generateTrash, 1200);
+  }
+}
+
+/* ================= 啟動 ================= */
+generateTrash();
+</script>
+
+</body>
+</html>
