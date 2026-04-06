@@ -12,7 +12,7 @@
 body {
   font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
 
-  /* 背景深墨綠 + 環保漸層 */
+  /* 背景深墨綠 環保漸層 */
   background: linear-gradient(135deg, #0d2e1f, #134d36, #1a6b48);
 
   margin: 0;
@@ -63,8 +63,8 @@ h1 {
   font-weight: bold;
   text-align: center;
   margin-bottom: 30px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25); /* 陰影稍微加深，更穩重 */
-  color: #133822; /* 深墨綠文字，對比清楚 */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25); /* 陰影稍微加深 */
+  color: #133822; /* 深墨綠文字 */
 }
 
 /* ================= 垃圾區 ================= */
@@ -146,7 +146,7 @@ h1 {
 @media (max-width: 600px) {
   #game {
     padding: 30px;
-    margin-bottom: 120px; /* 多給按鈕空間 */
+    margin-bottom: 120px;
   }
 
   h1 {
@@ -223,9 +223,9 @@ body {
 /* ================= 圖片================= */
 .trash-item {
   width: 100px;      /*  固定寬 */
-  height: 100px;     /*  固定高 → 完全一致 */
+  height: 100px;     /*  固定高 完全一致 */
 
-  object-fit: cover; /*  保持比例 + 填滿 */
+  object-fit: cover; /*  保持比例 填滿 */
 
   border: none;
   border-radius: 10px;
@@ -270,7 +270,7 @@ const categories = [
   { key: "玻璃", name: "玻璃" }
 ];
 
-/* ================= 大量圖片庫（可自行增加） ================= */
+/* ================= 圖片庫 ================= */
 const trashListMaster = [
   // 塑膠
   { img: "images/plastic1.jpg", type: "塑膠" },
@@ -342,7 +342,7 @@ function generateTrash() {
   const bin = document.getElementById("trash-bin");
 
   const result = document.getElementById("result");
-  // 清空結果文字（例如上一關的  正確 或  錯誤）
+  // 清空結果文字（例如上一關的 正確 或 錯誤）
 
   /* ---------------- 清空畫面 ---------------- */
   bin.innerHTML = "";
@@ -350,11 +350,11 @@ function generateTrash() {
 
   /* 隨機題目 */
 
-  /* 從分類中「過濾掉上一題」 */
+  /* 從分類中過濾掉上一題 */
   let newCategories = categories.filter(c => c.key !== previousCategory);
   /* 從剩下的分類中隨機選一個 */
   currentCategory = newCategories[Math.floor(Math.random() * newCategories.length)];
-  /* 記錄這一題，給下一題用 避免重複 */
+  /* 記錄這一題給下一題用 避免重複 */
   previousCategory = currentCategory.key;
 
   /* 顯示題目文字 */
@@ -385,7 +385,7 @@ function generateTrash() {
   const cols = 3;
   const rows = 2;
 
-  /* 計算每一格的寬度與高度 */
+  /* 計算每格的寬度與高度 */
   const xSpacing = bin.clientWidth / cols;
   const ySpacing = bin.clientHeight / rows;
   /* 設定圖片大小 */
@@ -432,7 +432,7 @@ function checkTrash(img) {
   /* 取得結果顯示區 */
   const result = document.getElementById("result");
 
-   /* ================= 判斷是否正確 ================= */
+/* ================= 判斷是否正確 ================= */
 
   if (img.dataset.type === currentCategory.key) {
     /* 加上正確樣式 變淡 */
